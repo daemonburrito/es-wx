@@ -1,0 +1,63 @@
+{
+  "extends": "react-app",
+  "root": true,
+  "parserOptions": {
+    "ecmaFeatures": {
+      "blockBindings": true,
+      "jsx": true
+    }
+  },
+
+  "rules": {
+    "jsx-a11y/href-no-hash": "off",
+    "prefer-template": "error",
+    "quotes": [
+      "error",
+      "single",
+      {
+        "allowTemplateLiterals": true
+      }
+    ],
+    "no-useless-concat": "error",
+    "max-len": [
+      "error",
+      {
+        "code": 80,
+        "ignoreComments": true,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "no-extra-semi": "error",
+    "semi": [
+      "error",
+      "always",
+      {
+        "omitLastInOneLineBlock": true
+      }
+    ],
+    "no-trailing-spaces": "error",
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 0,
+        "VariableDeclarator": 0,
+        "MemberExpression": 1,
+        "FunctionDeclaration": {
+          "parameters": 1,
+          "body": 1
+        },
+        "FunctionExpression": {
+          "parameters": 1,
+          "body": 1
+        },
+        "CallExpression": {
+          "arguments": 1
+        },
+        "ObjectExpression": 1
+      }
+    ]
+  }
+}
