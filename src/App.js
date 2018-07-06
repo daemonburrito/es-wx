@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import Display from './components/Display';
-import Controls from './components/Controls';
-import ProductsList from './components/controls/ProductsList';
+import Header from './components/Header';
+import Workspace from './components/Workspace';
 
 class App extends Component {
   // constructor(props) {
@@ -16,10 +15,8 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Display render={() => {}} />
-        <Controls>
-          <ProductsList products={[]} />
-        </Controls>
+        <Header />
+        <Workspace />
       </div>
     );
   }

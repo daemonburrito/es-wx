@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "compressjs": "^1.0.3",
+    "bzip2": "^0.1.1",
     "normalizr": "^3.2.4",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",

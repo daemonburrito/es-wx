@@ -1,4 +1,4 @@
-import compressjs from 'compressjs';
+import bzip2 from 'bzip2';
 import fs from 'fs';
 
 export const bunzip = arrayBuf => {
@@ -9,11 +9,10 @@ export const bunzip = arrayBuf => {
     console.warn('Dumping data to filesystem...');
 
     fs.writeFileSync(`${OUTPUT_PATH}.bz`, bytes);
-    let data = Buffer.from(compressjs.Bzip2.decompressFile(bytes));
+    let data = Buffer.from(bzip2.simple(bzip2.array(new Uint8Array(arrayBuf))));
     fs.writeFileSync(OUTPUT_PATH, data);
   }
-
-  return compressjs.Bzip2.decompressFile(new Uint8Array(arrayBuf)).buffer;
+  return bzip2.simple(bzip2.array(new Uint8Array(arrayBuf))).buffer;
 };
 
 // Get the bit at position i on a byte or bytes
