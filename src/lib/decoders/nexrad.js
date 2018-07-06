@@ -3,7 +3,15 @@
  */
 import { bunzip } from '../util';
 
-const getAsciiHeader = arrayBuf => {
+// This is a list of products we know how to decode, for UIs.
+export const KNOWN_PRODUCTS = [
+  {
+    description: `Base Reflectivity`,
+    code: `94`
+  }
+];
+
+export const getAsciiHeader = arrayBuf => {
   let asciiDecoder = new TextDecoder('ascii');
 
   let uInt8Array = new Uint8Array(arrayBuf, 0, 31);
@@ -20,7 +28,7 @@ const getAsciiHeader = arrayBuf => {
   };
 };
 
-const getHeader = arrayBuf => {
+export const getHeader = arrayBuf => {
   let view = new DataView(arrayBuf, 30, 48);
   return {
     messageCode: view.getInt16(),
@@ -34,7 +42,7 @@ const getHeader = arrayBuf => {
 };
 
 // Described in 2620001X Fig 3-6
-const getDescription = arrayBuf => {
+export const getDescription = arrayBuf => {
   let view = new DataView(arrayBuf, 50, 100);
   return {
     latitude: view.getInt32(),
@@ -64,7 +72,7 @@ const getDescription = arrayBuf => {
   };
 };
 
-export const decodeN0R = arrayBuf => {
+export const decodeP94 = arrayBuf => {
   // Example URL:
   // ftp://tgftp.nws.noaa.gov/SL.us008001/DF.of/DC.radar/DS.p94r0/SI.kewx/sn.last
 
@@ -131,16 +139,10 @@ export const decodeN0R = arrayBuf => {
   productDescription = getDescription(arrayBuf),
   productSymbology = getSymbology(arrayBuf);
 
-  console.log(
-    JSON.stringify(
-      {
-        asciiHeader,
-        productHeader,
-        productDescription,
-        productSymbology
-      },
-      null,
-      '\t'
-    )
-  );
+  return {
+    asciiHeader,
+    productHeader,
+    productDescription,
+    productSymbology
+  };
 };
