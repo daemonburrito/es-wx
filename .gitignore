@@ -1,33 +1,15 @@
-# See https://help.github.com/ignore-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
+node_modules
 
 # testing
-/coverage
+coverage
 
 # production
-/build
+build
 
-# environment variables
-# Note: All but *.local should be checked into Git.
-# https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#adding-development-environment-variables-in-env
-# Use development.local for local configuration.
+# CRA dotfile local overrides. All others (".env", ".env.${environment}") should be checked in.
 .env*.local
 
-# misc
 .DS_Store
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# graphic asset intermediate output
-assets/vector/out
-
-# output of styleguidist
-/styleguide
-
-# intellij idea
-/.idea
-
-/dump
+# binary debugging output, core dumps, etc.
+dump
