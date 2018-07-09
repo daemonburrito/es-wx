@@ -8,9 +8,11 @@ const withUI = compose(
   setDisplayName('withUI'),
   connect(
     state => ({ ui: uiSelector(state) }),
-    () => ({
-      selectProduct
-    })
+    dispatch => {
+      return {
+        selectProduct: productCode => dispatch(selectProduct(productCode))
+      };
+    }
   )
 );
 

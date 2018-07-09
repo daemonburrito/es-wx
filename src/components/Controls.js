@@ -52,7 +52,7 @@ class Controls extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log({ instance: this, prevProps });
+    this.props.selectProduct(this.state.selectedProduct);
   }
 
   render() {
