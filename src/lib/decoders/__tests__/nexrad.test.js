@@ -16,7 +16,7 @@ describe('Nexrad Level III decoders', () => {
     // read the whole file, which is guaranteed to be tiny
     let buf = fs.readFileSync(N0R_PATH);
     const product = decodeP94(buf.buffer);
-    console.log(JSON.stringify(product, null, '\t'));
+    // console.log(JSON.stringify(product, null, '\t'));
     return;
   });
 });

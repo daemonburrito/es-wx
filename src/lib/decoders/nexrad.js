@@ -6,8 +6,22 @@ import { bunzip } from '../util';
 // This is a list of products we know how to decode, for UIs.
 export const KNOWN_PRODUCTS = [
   {
-    description: `Base Reflectivity`,
-    code: `94`
+    code: `94`,
+    ntr: `1`,
+    productName: `Base Reflectivity Data Array`,
+    resolution: `.54 x 1 Nmi x Deg`,
+    range: `248`,
+    dataLevel: `256`,
+    format: `Radial Image`
+  },
+  {
+    code: `99`,
+    ntr: `2`,
+    productName: `Base Velocity Data Array`,
+    resolution: `.13 x 1 Nmi x Deg`,
+    range: `124`,
+    dataLevel: `256`,
+    format: `Radial Image`
   }
 ];
 
