@@ -4,7 +4,8 @@
   "description": "HTTP Proxy for caching TGFTP data",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +13,7 @@
     "decompress": "^4.2.0",
     "express": "^4.16.3",
     "http-proxy": "^1.17.0",
-    "http-proxy-middleware": "^0.18.0"
+    "http-proxy-middleware": "^0.18.0",
+    "node-cache": "^4.2.0"
   }
 }
