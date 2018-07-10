@@ -14,17 +14,17 @@ const configureStore = preloadedState => {
     composeWithDevTools(applyMiddleware(sagaMiddleware))
   );
 
-  // if (module.hot) {
-  //   // Enable Webpack hot module replacement for reducers
-  //   module.hot.accept('../reducers/root', () => {
-  //     store.replaceReducer(rootReducer);
-  //   });
-  // }
+  if (module.hot) {
+    // Enable Webpack hot module replacement for reducers
+    module.hot.accept('../reducers/root', () => {
+      store.replaceReducer(rootReducer);
+    });
+  }
   sagaMiddleware.run(rootSaga);
 
   // For SSR
-  // store.runSaga = sagaMiddleware.run;
-  // store.close = () => store.dispatch(END);
+  store.runSaga = sagaMiddleware.run;
+  store.close = () => store.dispatch(END);
   return store;
 };
 

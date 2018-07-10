@@ -44,15 +44,14 @@ class Controls extends React.Component {
 
   handleProductSelect(ev) {
     ev.persist();
-    this.setState((prevState, props) => {
-      return {
-        selectedProduct: ev.target.value
-      };
-    });
-  }
-
-  componentDidUpdate(prevProps) {
-    this.props.selectProduct(this.state.selectedProduct);
+    this.setState(
+      (prevState, props) => {
+        return {
+          selectedProduct: ev.target.value
+        };
+      },
+      () => this.props.selectProduct(this.state.selectedProduct)
+    );
   }
 
   render() {

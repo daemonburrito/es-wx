@@ -14,8 +14,8 @@ const configureStore = preloadedState => {
   sagaMiddleware.run(rootSaga);
 
   // For SSR
-  // store.runSaga = sagaMiddleware.run;
-  // store.close = () => store.dispatch(END);
+  store.runSaga = sagaMiddleware.run;
+  store.close = () => store.dispatch(END);
 };
 
 export default configureStore;
