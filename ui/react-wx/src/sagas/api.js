@@ -1,44 +1,41 @@
-import { takeEvery } from 'redux-saga/effects';
+import { put, takeEvery } from 'redux-saga/effects';
 import { TGFTP_URL_PATTERN, TGFTP_HOST } from '../constants';
+import * as tgftpActions from '../actions/tgftp';
 
 export const watchTgftp = function*() {
   yield takeEvery(
-    // tgftpActions.types.fetchLatestProductTypes[tgftpActions.types.REQUEST],
     action => {
-      if (action.tgftp === true) {
-        if (action.type.indexOf('REQUEST' !== -1)) {
-          return true;
-        }
+      if (action.tgftp === true && action.type.indexOf('REQUEST') !== -1) {
+        return true;
       }
     },
     function*(action) {
+      if (!action.payload || !action.payload.productCode) {
+        return yield put(
+          tgftpActions.fetchLatestProductFailure(`No product code.`)
+        );
+      }
       const url = TGFTP_URL_PATTERN.stringify({
         productCode: action.payload.productCode,
-        elevationNumber: '0',
+        elevationNumber: action.payload.elevation || 0,
         index: 'last'
       });
-      // console.log({
-      //   action,
-      //   url
-      // });
-      yield fetch(`${TGFTP_HOST}${url}`)
+
+      const resAction = yield fetch(`${TGFTP_HOST}${url}`)
         .then(function(response) {
           if (response.ok) {
-            // console.log(response);
-            return response;
+            return response.arrayBuffer();
           }
           throw new Error('Network response was not ok.');
         })
-        .then(function(myBlob) {
-          // console.log(myBlob);
-          return myBlob;
+        .then(function(arrayBuf) {
+          return tgftpActions.fetchLatestProductSuccess(arrayBuf);
         })
         .catch(function(error) {
-          console.log(
-            'There has been a problem with your fetch operation: ',
-            error.message
-          );
+          console.error(`Fetch error: ${error.message}`);
+          return tgftpActions.fetchLatestProductFailure(error.message);
         });
+      yield put(resAction);
     }
   );
 };

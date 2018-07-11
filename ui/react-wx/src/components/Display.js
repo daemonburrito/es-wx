@@ -1,10 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Display = ({ render }) => <section />;
+import Viewport from './display/Viewport';
 
-Display.propTypes = {
-  render: PropTypes.func
+const Display = class extends React.Component {
+  render() {
+    return <Viewport />;
+  }
 };
+
+// Display.propTypes = {
+//   ui: PropTypes.func
+// };
+//
+// Display.defaultProps = {
+//   ui: {}
+// };
 
 export default Display;

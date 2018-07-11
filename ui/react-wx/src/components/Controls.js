@@ -6,7 +6,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import withUI from '../containers/hoc/withUI';
 
 import ProductSelectorNexrad from './controls/ProductSelectorNexrad';
 
@@ -58,4 +57,4 @@ Controls.defaultProps = {
   style: defaultStyle
 };
 
-export default withUI(Controls);
+export default Controls;
