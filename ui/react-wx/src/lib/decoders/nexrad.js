@@ -59,30 +59,40 @@ export const getHeader = arrayBuf => {
 export const getDescription = arrayBuf => {
   let view = new DataView(arrayBuf, 50, 100);
   return {
-    latitude: view.getInt32(),
-    longitude: view.getInt32(4),
-    height: view.getInt16(8),
+    // Figure 3-6. Graphic Product Message (Sheet 5)
+    latitude: view.getInt32(), // * .001 deg N
+    longitude: view.getInt32(4), // * .001 deg E
+    height: view.getInt16(8), // ft
     productCode: view.getInt16(10),
-    operationalMode: view.getInt16(12),
-    volCovPattern: view.getInt16(14),
-    seqNumber: view.getInt16(16),
-    volScanNumber: view.getInt16(18),
-    volScanDate: view.getInt16(20),
-    volScanTime: view.getInt32(22),
-    generationDate: view.getInt16(26),
-    generationTime: view.getInt32(28),
-    elevationNumber: view.getInt16(36),
-    elevationAngle: view.getInt16(38),
-    thresholdMinimum: view.getInt16(40),
-    thresholdIncrement: view.getInt16(42),
-    thresholdLevels: view.getInt16(44),
-    maxReflectivity: view.getInt16(72),
-    compressionMethod: view.getInt16(80),
-    uncompressedDataSize: view.getInt32(82),
+    operationalMode: view.getInt16(12), // 0-2 c.OPERATIONAL_MODES
+    volCovPattern: view.getInt16(14), // 1-767 Volume Coverage Pattern
+    // "RDA volume coverage pattern for the scan strategy being used"
+
+    seqNumber: view.getInt16(16), // -13, 0-32767 Sequence Number of request
+    // (not from us, but the RPGOP or Class 1 user). -13 if pushed by an alert.
+
+    volScanNumber: view.getInt16(18), // 1-80, counter
+    volScanDate: view.getInt16(20), // 1-32767 MJD
+    volScanTime: view.getInt32(22), // start time, s since 00:00GMT
+    generationDate: view.getInt16(26), // MJD
+    generationTime: view.getInt32(28), // s since 00:00GMT
+    elevationNumber: view.getInt16(36), // 0-20, 0 for volume-based scans
+    // The following product-dependent values are for 94, other formats
+    // to follow.
+    elevationAngle: view.getInt16(38), // (HWORD 30) * .1 deg -1.0 to 45.0
+    // 94 has 254 values, 2-255
+    thresholdMinimum: view.getInt16(40), // dBZ * 10 0="Below TH" 1="Missing"
+    thresholdIncrement: view.getInt16(42), // dBZ * 10
+    thresholdLevels: view.getInt16(44), // 0-255
+    // this gap was levels for old product 19 (16 levels)
+    maxReflectivity: view.getInt16(72), // (HWORD 47) dBZ-32 to +95, (-33 n/a)
+    compressionMethod: view.getInt16(80), // 0 or 1 for bzip
+    uncompressedDataSize: view.getInt32(82), // bytes
     version: view.getInt8(86),
-    offsetToSymbology: view.getInt32(88),
-    offsetToGraphic: view.getInt32(92),
-    offsetToTabular: view.getInt32(96)
+    spotBlanking: view.getInt8(87), // bool if product
+    offsetToSymbology: view.getInt32(88), // in hwords
+    offsetToGraphic: view.getInt32(92), //
+    offsetToTabular: view.getInt32(96) //
   };
 };
 
@@ -92,7 +102,8 @@ export const decodeP94 = arrayBuf => {
 
   // Format decribed in this Interface Control Document
   // https://www.roc.noaa.gov/wsr88d/PublicDocs/ICDs/2620001X.pdf
-
+  // For packet code 16, see
+  // Figure 3-11c. Digital Radial Data Array Packet
   const getSymbology = arrayBuf => {
     let view = new DataView(bunzip(arrayBuf.slice(150)));
 
@@ -112,9 +123,9 @@ export const decodeP94 = arrayBuf => {
           let length = view.getInt16(offset);
 
           let data = {
-            lengthBytes: length,
-            startAngle: view.getInt16(2 + offset),
-            deltaAngle: view.getInt16(4 + offset),
+            lengthBytes: length, // number of 8-bit values
+            startAngle: view.getInt16(2 + offset), // * .1 0.0-359.9
+            deltaAngle: view.getInt16(4 + offset), // * .1 0.0-2.0
             bins: new Int8Array(view.buffer, 6 + offset, length)
           };
           this.offset = offset + length + 6;
@@ -132,12 +143,13 @@ export const decodeP94 = arrayBuf => {
         return {
           length: view.getInt32(12),
           packetCode: view.getInt16(16),
-          firstBinIndex: view.getInt16(18),
-          binsCount: view.getInt16(20),
-          centerI: view.getInt16(22),
-          centerJ: view.getInt16(24),
-          elevationCos: view.getInt16(26),
-          radialsCount: view.getInt16(28),
+          firstBinIndex: view.getInt16(18), // 0-230 Location of first range bin
+          binsCount: view.getInt16(20), // 0-1840 Range bin count in radial
+          centerI: view.getInt16(22), // km/4 -2048 to 2047
+          centerJ: view.getInt16(24), // km/4 -2048 to 2047
+          elevationCos: view.getInt16(26), // * .001 cos of elev angle for elev
+          // products, 1.00 for volume products
+          radialsCount: view.getInt16(28), // 1-720 total radials in product
           radials: getRadials(view.buffer, view.getInt16(28), view.getInt16(20))
         };
       });
