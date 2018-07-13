@@ -28,8 +28,8 @@ This project is a baby. Some TODOs include:
 - Fetching of binaries from NOAA servers and responsible use of
   `ServiceWorkers` and caching for offline use and friendliness with limited
   resources.
-  - Almost everyone will be using the 5-minute old data, as it is available on
+  - ~~Almost everyone will be using the 5-minute old data, as it is available on
     NOAA HTTP and FTP servers. Gracefully getting that data without getting in
-    trouble is top priority.
+    trouble is top priority.~~ Included is a caching proxy, `es-wx-tgftp-proxy`, which will work for development.
   - I don't have a real-time paid connection, so someone who has such a
     connection will be required to decode streaming data.
