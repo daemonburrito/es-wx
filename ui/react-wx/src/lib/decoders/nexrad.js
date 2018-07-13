@@ -25,6 +25,7 @@ export const KNOWN_PRODUCTS = [
   }
 ];
 
+// Retrieve the ascii prefixed header data
 export const getAsciiHeader = arrayBuf => {
   let asciiDecoder = new TextDecoder('ascii');
 
@@ -96,70 +97,77 @@ export const getDescription = arrayBuf => {
   };
 };
 
+// Get the array of Int8Array-packed radials
+// arrayBuf: ArrayBuffer starting at Symbology
+const getRadials = (arrayBuf, radialsCount, binsCount) => {
+  let view = new DataView(arrayBuf, 30);
+
+  return Array.from(
+    Array(radialsCount),
+    function(v, i) {
+      let offset = this.offset;
+      let length = view.getInt16(offset);
+
+      let data = {
+        // These are apparently contrary to the ICD documentation in Figure
+        // 3-11c. Digital Radial Data Array Packet - Packet Code 16 (Sheet 1),
+        // where only delta and bins are repeated for each radial. This may
+        // have been mixed up with the older 16-level format (p19). Examination
+        // shows that length and start angle are repeated for each radial in
+        // code 16 packets.
+        lengthBytes: length, // number of 8-bit values
+        startAngle: view.getInt16(2 + offset), // * .1 0.0-359.9
+        deltaAngle: view.getInt16(4 + offset), // * .1 0.0-2.0
+        bins: new Int8Array(view.buffer, 6 + offset, length)
+      };
+      this.offset = offset + length + 6;
+      return data;
+    },
+    {
+      offset: 0
+    }
+  );
+};
+
+// Format decribed in this Interface Control Document
+// https://www.roc.noaa.gov/wsr88d/PublicDocs/ICDs/2620001X.pdf
+// For packet code 16, see
+// Figure 3-11c. Digital Radial Data Array Packet
+const getSymbology = arrayBuf => {
+  let view = new DataView(bunzip(arrayBuf.slice(150)));
+
+  const symbology = {
+    blockId: view.getInt16(2),
+    blockLength: view.getInt32(4),
+    layersCount: view.getInt16(8)
+  };
+
+  const layers = Array(symbology.layersCount)
+    .fill()
+    .map(_ => {
+      return {
+        length: view.getInt32(12),
+        packetCode: view.getInt16(16),
+        firstBinIndex: view.getInt16(18), // 0-230 Location of first range bin
+        binsCount: view.getInt16(20), // 0-1840 Range bin count in radial
+        centerI: view.getInt16(22), // km/4 -2048 to 2047
+        centerJ: view.getInt16(24), // km/4 -2048 to 2047
+        elevationCos: view.getInt16(26), // * .001 cos of elev angle for elev
+        // products, 1.00 for volume products
+        radialsCount: view.getInt16(28), // 1-720 total radials in product
+        radials: getRadials(view.buffer, view.getInt16(28), view.getInt16(20))
+      };
+    });
+
+  return {
+    ...symbology,
+    layers
+  };
+};
+
 export const decodeP94 = arrayBuf => {
   // Example URL:
   // ftp://tgftp.nws.noaa.gov/SL.us008001/DF.of/DC.radar/DS.p94r0/SI.kewx/sn.last
-
-  // Format decribed in this Interface Control Document
-  // https://www.roc.noaa.gov/wsr88d/PublicDocs/ICDs/2620001X.pdf
-  // For packet code 16, see
-  // Figure 3-11c. Digital Radial Data Array Packet
-  const getSymbology = arrayBuf => {
-    let view = new DataView(bunzip(arrayBuf.slice(150)));
-
-    const symbology = {
-      blockId: view.getInt16(2),
-      blockLength: view.getInt32(4),
-      layersCount: view.getInt16(8)
-    };
-
-    const getRadials = (arrayBuf, radialsCount, binsCount) => {
-      let view = new DataView(arrayBuf, 30);
-
-      return Array.from(
-        Array(radialsCount),
-        function(v, i) {
-          let offset = this.offset;
-          let length = view.getInt16(offset);
-
-          let data = {
-            lengthBytes: length, // number of 8-bit values
-            startAngle: view.getInt16(2 + offset), // * .1 0.0-359.9
-            deltaAngle: view.getInt16(4 + offset), // * .1 0.0-2.0
-            bins: new Int8Array(view.buffer, 6 + offset, length)
-          };
-          this.offset = offset + length + 6;
-          return data;
-        },
-        {
-          offset: 0
-        }
-      );
-    };
-
-    const layers = Array(symbology.layersCount)
-      .fill()
-      .map(_ => {
-        return {
-          length: view.getInt32(12),
-          packetCode: view.getInt16(16),
-          firstBinIndex: view.getInt16(18), // 0-230 Location of first range bin
-          binsCount: view.getInt16(20), // 0-1840 Range bin count in radial
-          centerI: view.getInt16(22), // km/4 -2048 to 2047
-          centerJ: view.getInt16(24), // km/4 -2048 to 2047
-          elevationCos: view.getInt16(26), // * .001 cos of elev angle for elev
-          // products, 1.00 for volume products
-          radialsCount: view.getInt16(28), // 1-720 total radials in product
-          radials: getRadials(view.buffer, view.getInt16(28), view.getInt16(20))
-        };
-      });
-
-    return {
-      ...symbology,
-      layers
-    };
-  };
-
   let asciiHeader = getAsciiHeader(arrayBuf),
   productHeader = getHeader(arrayBuf),
   productDescription = getDescription(arrayBuf),
@@ -171,4 +179,8 @@ export const decodeP94 = arrayBuf => {
     productDescription,
     data: productSymbology
   };
+};
+
+export default {
+  decodeP94
 };

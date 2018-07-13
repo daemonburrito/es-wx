@@ -17,3 +17,8 @@ export const bunzip = arrayBuf => {
 
 // Get the bit at position i on a byte or bytes
 export const getBit = (uint8r, i, rIdx = 0) => (uint8r[rIdx] & (1 << i)) !== 0;
+
+// Get the "modified julian date" from days since unix epoch
+export const MJDtoDate = unixEpochDaysUTC => {
+  return new Date(unixEpochDaysUTC * 86400 * 1000);
+};
