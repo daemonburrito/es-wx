@@ -1,7 +1,7 @@
 /**
  * Nexrad codecs
  */
-import { bunzip } from '../util';
+import { bunzip } from '../utils';
 
 // This is a list of products we know how to decode, for UIs.
 export const KNOWN_PRODUCTS = [
@@ -118,7 +118,7 @@ const getRadials = (arrayBuf, radialsCount, binsCount) => {
         lengthBytes: length, // number of 8-bit values
         startAngle: view.getInt16(2 + offset), // * .1 0.0-359.9
         deltaAngle: view.getInt16(4 + offset), // * .1 0.0-2.0
-        bins: new Int8Array(view.buffer, 6 + offset, length)
+        bins: new Uint8Array(view.buffer, 6 + offset, length)
       };
       this.offset = offset + length + 6;
       return data;
